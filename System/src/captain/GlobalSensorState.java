@@ -25,11 +25,12 @@ public class GlobalSensorState {
 		sensorLookup = new ConcurrentHashMap<Sensor, List<SensorGroup>>();
 	}
 	
-	static synchronized public void addSensor(Sensor s) {
+	static synchronized public void addSensor(Sensor s, DataUploadLayer du) throws Exception {
 		sensors.add(s);
 		if (sensorLookup == null) System.out.println("Hashmap is null");
 		List<SensorGroup> emptyGroup = new ArrayList<SensorGroup>();
 		sensorLookup.put(s, emptyGroup);
+		du.uploadSensor(s);
 	}
 	
 	static synchronized public void removeSensor(int id) {
@@ -74,6 +75,7 @@ public class GlobalSensorState {
 				}
 			}
 			sensorGroups.add(g);
+			System.out.println(g.getID() + " is the id of the group");
 			du.uploadGroup(g);
 		}
 	}

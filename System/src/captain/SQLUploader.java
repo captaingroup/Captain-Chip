@@ -21,7 +21,20 @@ public class SQLUploader extends DataUploadLayer {
 	void upload(Packet p, SensorGroup g) throws SQLException, ClassNotFoundException {
 		if (connect == null) initialise();
 		
-		System.out.println("Upload method being called");
+		String uploadPacketQuery = "INSERT `sql331497`.`Data` (`SensorID`, `GroupID`, `Data`, `Timestamp`) "
+				+ "VALUES (?, ?, ?, ?)";
+		PreparedStatement uploadPacket = connect.prepareStatement(uploadPacketQuery);
+		uploadPacket.setInt(1, g.getID());
+		uploadPacket.setInt(2, p.getSensor().getID());
+		uploadPacket.setString(3, p.getData().trim());
+		uploadPacket.setString(4, p.getTimestamp());
+		
+		System.out.println("Adding data to table now");
+		
+		uploadPacket.executeUpdate();
+		
+		
+		/*System.out.println("Upload method being called");
 		System.out.println("Uploading " + p + ", sensor group ID " + g.getID());
 		System.out.println(g.getID());
 		
@@ -53,10 +66,10 @@ public class SQLUploader extends DataUploadLayer {
 		}
 		
 		//uploading packet
-		/*String uploadQuery = 
-				"INSERT INTO `sql331497`.`" + g.getGroupName() + 
-				"` (`sensorID`, `data`, `timestamp`) "
-				+ "VALUES (?, " + p.getData() + " , ?)";*/
+		//String uploadQuery = 
+		//		"INSERT INTO `sql331497`.`" + g.getGroupName() + 
+		//		"` (`sensorID`, `data`, `timestamp`) "
+		//		+ "VALUES (?, " + p.getData() + " , ?)";
 		String uploadQuery = "INSERT INTO `sql331497`.`" + g.getGroupName() + "` (`sensorID`, `data`, `timestamp`) "
 				+ "VALUES (?, '" + p.getData().trim() + "' , ?)";
 		PreparedStatement upload = connect.prepareStatement(uploadQuery);
@@ -70,7 +83,7 @@ public class SQLUploader extends DataUploadLayer {
 		upload.setString(2, p.getTimestamp());
 		System.out.println("Upload SQL statement: " + upload);
 		upload.executeUpdate();
-		System.out.println("Packet uploaded!");
+		System.out.println("Packet uploaded!");*/
 		
 	}
 
@@ -78,24 +91,45 @@ public class SQLUploader extends DataUploadLayer {
 		
 		if (connect == null) initialise();
 		
-		String createGroupQuery = "INSERT INTO `sql331497`.`GroupInformation` (`Name`) VALUES (?)";
-		PreparedStatement createGroup = connect.prepareStatement(createGroupQuery);
-		createGroup.setString(1, g.getGroupName());
-		System.out.println("Adding new group");
-		createGroup.executeUpdate();
-		
-		List<Sensor> sensors = g.getSensors();
-		for (Sensor s : sensors) {
-			String uploadPairingQuery = "INSERT INTO `sql331497`.`SensorGroup` (`GroupID`, `SensorID`) "
-					+ "VALUES (?, ?)";
-			PreparedStatement uploadPairing = connect.prepareStatement(uploadPairingQuery);
-			uploadPairing.setInt(1, s.getID());
-			uploadPairing.setInt(1, g.getID());
-			System.out.println("Uploading pairing");
-			uploadPairing.executeUpdate();
+		String doesGroupExistQuery = "SELECT * FROM `sql331497`.`GroupInfo`";
+		PreparedStatement doesGroupExist = connect.prepareStatement(doesGroupExistQuery);
+		ResultSet results = doesGroupExist.executeQuery();
+		if (!results.next()) {
+			String createGroupQuery = "INSERT INTO `sql331497`.`GroupInfo` (`Name`) VALUES (?)";
+			PreparedStatement createGroup = connect.prepareStatement(createGroupQuery);
+			createGroup.setString(1, g.getGroupName().trim());
+			System.out.println("Adding new group");
+			createGroup.executeUpdate();
 			
+			List<Sensor> sensors = g.getSensors();
+			for (Sensor s : sensors) {
+				String uploadPairingQuery = "INSERT INTO `sql331497`.`SensorGroup` (`GroupID`, `SensorID`) "
+						+ "VALUES (?, ?)";
+				PreparedStatement uploadPairing = connect.prepareStatement(uploadPairingQuery);
+				uploadPairing.setInt(1, s.getID());
+				uploadPairing.setInt(2, g.getID());
+				System.out.println("Uploading pairing");
+				uploadPairing.executeUpdate();
+				
+			}
 		}
 		
+	}
+
+	@Override
+	void uploadSensor(Sensor s) throws Exception {
+		
+		if (connect == null) initialise();
+		
+		//Check for existing sensor
+		//String doesSensorExist = "SELECT * FROM `sql331497`.`SensorCorrect` WHERE "
+		
+		String addSensorQuery = "INSERT INTO `sql331497`.`SensorCorrect` (`Type`, `Category`) "
+				+ "VALUES (? ?)	";
+		PreparedStatement addSensor = connect.prepareStatement(addSensorQuery);
+		addSensor.setString(1, s.getName());
+		addSensor.setString(2, s.getDeviceType());
+		System.out.println("Adding sensor now");
 	}
 
 }

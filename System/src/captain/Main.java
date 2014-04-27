@@ -50,8 +50,8 @@ public class Main {
 		
 		//Adding mock data
 		GlobalSensorState.initialise();
-		GlobalSensorState.addSensor(random1);
-		GlobalSensorState.addSensor(random2);
+		GlobalSensorState.addSensor(random1, uploader);
+		GlobalSensorState.addSensor(random2, uploader);
 		GlobalSensorState.generateSensorGroups(groups, uploader);
 		
 		//Starting sensors and listeners
