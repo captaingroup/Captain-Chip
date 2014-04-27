@@ -2,10 +2,11 @@ package captain;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Sensor extends Thread{
+public class Sensor extends Thread {
 	
-	int ID;	//ID is set when first packet is read in
-	String deviceType;
+	private int ID;	//ID is set when first packet is read in
+	private String deviceType;
+	//add data retrieval frequency
 	
 	public ConcurrentLinkedQueue<Packet> packets;
 	
@@ -14,5 +15,8 @@ public class Sensor extends Thread{
 		this.ID = ID;
 		this.deviceType = deviceType;
 	}
+	
+	public int getID() { return ID; }
+	public String getDeviceType() { return deviceType; }
 
 }

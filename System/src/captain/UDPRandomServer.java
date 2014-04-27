@@ -31,6 +31,7 @@ public class UDPRandomServer extends Thread {
 	}
 	
 	public void run() {
+		System.out.println("Random number generator being launched");
 		Random random = new Random();
 		while (true) {
 			//String value = String.valueOf(random.nextInt(100));
@@ -68,14 +69,15 @@ public class UDPRandomServer extends Thread {
 			//sending packet
 			DatagramPacket packet = new DatagramPacket(packetData, packetData.length, address, port);
 			try {
-				System.out.println("Sensor " + ID + " generated " + numberString);
+				//System.out.println("Sensor " + ID + " generated " + numberString);
 				//System.out.println("Sending " + packetData.length + " bytes");
+				//System.out.println("Sending packet " + "ID: " + ID + ", data: " + num + ", " + timestamp);
 				socket.send(packet);
 			} catch (IOException e) {
 				System.out.println("Could not send packet");
 			}
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

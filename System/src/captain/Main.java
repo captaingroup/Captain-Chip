@@ -2,6 +2,7 @@ package captain;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -12,7 +13,7 @@ public class Main {
 	
 	public static ConcurrentLinkedQueue<DataPoint> dataStore = new ConcurrentLinkedQueue<DataPoint>();
 	
-	public static void main (String[] args) throws SocketException, UnknownHostException {
+	public static void main (String[] args) throws Exception {
 
 		/**********************
 		 * Note that the sensor and receiver are being defined in the main method just for demo
@@ -28,22 +29,65 @@ public class Main {
 		
 		sensors = new LinkedList<Sensor>();
 		
-		Sensor random1 = new RandomConnector(1, "random", 5001);
+		Sensor random1 = new RandomSensor(1, "random1", 5001);
+		Sensor random2 = new RandomSensor(2, "random2", 6001);
+		
 		UDPRandomServer dataOut = new UDPRandomServer(5001, 100, 1, "thread1");
-		sensors.add(random1);
+		UDPRandomServer dataOut2 = new UDPRandomServer(6001, 1000, 1, "thread2");
 		
+		List<String> sensorGroup = new ArrayList<String>();		//represents profile
+		sensorGroup.add("123");
+		sensorGroup.add("TestGroup");
+		sensorGroup.add("random2");
+		sensorGroup.add("random1");
+		
+		List<List<String>> groups = new ArrayList<List<String>>();
+		groups.add(sensorGroup);
+		
+		//Data uploader
+		SQLUploader uploader = new SQLUploader();
+		UploadController uc = new UploadController(uploader);
+		
+		//Adding mock data
+		GlobalSensorState.initialise();
+		GlobalSensorState.addSensor(random1);
+		GlobalSensorState.addSensor(random2);
+		GlobalSensorState.generateSensorGroups(groups, uploader);
+		
+		//Starting sensors and listeners
 		dataOut.start();
+		dataOut2.start();
 		random1.start();
+		random2.start();
 		
-		while (true) {
-			int numSensors = sensors.size();
-			//System.out.println("number of sensors: " + numSensors);
-			for (int i = 0; i < numSensors; i++) {
-				Packet packet = sensors.get(i).packets.poll();
-				if (packet != null) System.out.println(packet);
-				//else System.out.println("this shit's null yo");
-			}
-		}
+		System.out.println("About to initialise other stuff");
+		
+		System.out.println("Created upload controller");
+		
+		uc.start();
+		
+		System.out.println("Running upload controller");
+		
+		System.out.println("All threads are running");
+		
+//		sensors.add(random1);
+//		sensors.add(random2);
+//		
+//		dataOut.start();
+//		dataOut2.start();
+//		random1.start();
+//		random2.start();
+//		
+//		while (true) {
+//			Thread.sleep(100);
+//			int numSensors = sensors.size();
+//			//System.out.println("number of sensors: " + numSensors);
+//			for (int i = 0; i < numSensors; i++) {
+//				Packet packet = sensors.get(i).packets.poll();
+//				if (packet != null) System.out.println("Received packet: " + packet);
+//				//else System.out.println("this shit's null yo");
+//			}
+//		}
 		
 	}
 
