@@ -19,6 +19,8 @@ public class GlobalSensorState {
 	//is a hashmap worth it, given that it also has to be kept consistent?)
 	private static ConcurrentHashMap<Sensor, List<SensorGroup>> sensorLookup;
 	
+	private List<List<String>> profile;
+	
 	public static void initialise() {
 		sensors = new ArrayList<Sensor>();
 		sensorGroups = new ArrayList<SensorGroup>();

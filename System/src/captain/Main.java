@@ -31,9 +31,11 @@ public class Main {
 		
 		Sensor random1 = new RandomSensor(1, "random1", 5001);
 		Sensor random2 = new RandomSensor(2, "random2", 6001);
+		Sensor random3 = new RandomSensor(3, "random1", 7001);
 		
 		UDPRandomServer dataOut = new UDPRandomServer(5001, 100, 1, "thread1");
 		UDPRandomServer dataOut2 = new UDPRandomServer(6001, 1000, 1, "thread2");
+		UDPRandomServer dataOut3 = new UDPRandomServer(7001, 150, 1, "thread3");
 		
 		List<String> sensorGroup = new ArrayList<String>();		//represents profile
 		sensorGroup.add("123");
@@ -52,13 +54,16 @@ public class Main {
 		GlobalSensorState.initialise();
 		GlobalSensorState.addSensor(random1, uploader);
 		GlobalSensorState.addSensor(random2, uploader);
+		GlobalSensorState.addSensor(random3, uploader);
 		GlobalSensorState.generateSensorGroups(groups, uploader);
 		
 		//Starting sensors and listeners
 		dataOut.start();
 		dataOut2.start();
+		dataOut3.start();
 		random1.start();
 		random2.start();
+		random3.start();
 		
 		System.out.println("About to initialise other stuff");
 		

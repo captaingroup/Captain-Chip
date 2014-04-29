@@ -24,8 +24,10 @@ public class SQLUploader extends DataUploadLayer {
 		String uploadPacketQuery = "INSERT `sql331497`.`Data` (`SensorID`, `GroupID`, `Data`, `Timestamp`) "
 				+ "VALUES (?, ?, ?, ?)";
 		PreparedStatement uploadPacket = connect.prepareStatement(uploadPacketQuery);
-		uploadPacket.setInt(1, g.getID());
-		uploadPacket.setInt(2, p.getSensor().getID());
+		//uploadPacket.setInt(1, g.getID());
+		uploadPacket.setInt(1, p.getSensor().getID());
+		//uploadPacket.setInt(2, p.getSensor().getID());
+		uploadPacket.setInt(2, g.getID());
 		uploadPacket.setString(3, p.getData().trim());
 		uploadPacket.setString(4, p.getTimestamp());
 		
@@ -91,11 +93,11 @@ public class SQLUploader extends DataUploadLayer {
 		
 		if (connect == null) initialise();
 		
-		String doesGroupExistQuery = "SELECT * FROM `sql331497`.`GroupInfo`";
+		String doesGroupExistQuery = "SELECT * FROM `sql331497`.`GroupInformation`";
 		PreparedStatement doesGroupExist = connect.prepareStatement(doesGroupExistQuery);
 		ResultSet results = doesGroupExist.executeQuery();
 		if (!results.next()) {
-			String createGroupQuery = "INSERT INTO `sql331497`.`GroupInfo` (`Name`) VALUES (?)";
+			String createGroupQuery = "INSERT INTO `sql331497`.`GroupInformation` (`Name`) VALUES (?)";
 			PreparedStatement createGroup = connect.prepareStatement(createGroupQuery);
 			createGroup.setString(1, g.getGroupName().trim());
 			System.out.println("Adding new group");
@@ -106,8 +108,9 @@ public class SQLUploader extends DataUploadLayer {
 				String uploadPairingQuery = "INSERT INTO `sql331497`.`SensorGroup` (`GroupID`, `SensorID`) "
 						+ "VALUES (?, ?)";
 				PreparedStatement uploadPairing = connect.prepareStatement(uploadPairingQuery);
-				uploadPairing.setInt(1, s.getID());
-				uploadPairing.setInt(2, g.getID());
+				
+				uploadPairing.setInt(1, g.getID());
+				uploadPairing.setInt(2, s.getID());
 				System.out.println("Uploading pairing");
 				uploadPairing.executeUpdate();
 				
@@ -118,7 +121,7 @@ public class SQLUploader extends DataUploadLayer {
 
 	@Override
 	void uploadSensor(Sensor s) throws Exception {
-		
+
 		if (connect == null) initialise();
 		
 		//Check for existing sensor
